@@ -1,0 +1,16 @@
+# Secrets - env.example is the template that gets committed, .env is yours
+.env
+
+# Virtual environments
+.venv/
+venv/
+
+# Tutorial working files (created at runtime)
+_scratch/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
