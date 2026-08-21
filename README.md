@@ -14,18 +14,48 @@ series is about engineering *reliable systems* on top of a
 
 ## Setup
 
-Everything happens inside a virtual environment, once:
+**You need Python 3.11, 3.12, or 3.13.** Not older (macOS's built-in
+`python3` is 3.9) and not 3.14 yet - fairlib's pinned numeric stack
+(torch, faiss, onnxruntime) has no wheels for 3.14, so `pip install`
+fails outright and nothing lands. If you are unsure what you have,
+run `python3 --version` (Windows: `py --list`). Install 3.12 from
+<https://www.python.org/downloads/> if needed; on Windows tick
+**"Add python.exe to PATH"** in the installer.
+
+Everything else happens inside a virtual environment, once:
 
 ```bash
 git clone https://github.com/auswein7/fairlib-tutorials.git
 cd fairlib-tutorials
 
-python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+# macOS / Linux
+python3.12 -m venv .venv
+source .venv/bin/activate
 
-pip install "fair-llm[all]" jupyterlab
+# Windows (PowerShell or cmd)
+py -3.12 -m venv .venv
+.venv\Scripts\activate
+
+python -m pip install --upgrade pip
+python -m pip install "fair-llm[all]" jupyterlab
 cp env.example .env                # Windows: copy env.example .env
+python check_setup.py
 ```
+
+`check_setup.py` verifies the interpreter, the venv, every import the
+tutorials use, and your `.env`; each failure prints the exact fix.
+Run it again any time an import fails - **before** trying
+`pip install` guesses. In particular, do not `pip install fairlib`:
+that is an unrelated fairness library on PyPI (and it does not even
+build on modern Python). The package is `fair-llm`; the import is
+`fairlib`. There is no `fair_llm` module - if a tutorial only runs
+after you rewrite its imports, your environment is wrong, not the
+tutorial.
+
+Your prompt shows `(.venv)` while the environment is active; open a
+new terminal and it is gone until you activate again. Always start
+the tutorials from an activated terminal, and launch Jupyter from the
+same terminal (`jupyter lab`) so notebooks use this venv's kernel.
 
 Then open `.env` in any editor and fill in the two values - your
 Hugging Face token and the model your machine can carry. **Pick the
@@ -135,7 +165,11 @@ is most comfortable on a lab machine, but it runs at any model size.
 
 ## When a run fails
 
-First check [HARDWARE.md](HARDWARE.md)'s pass/fail matrix for your
+**`ModuleNotFoundError` (dotenv, fairlib, torch, ...)** - your
+terminal is not in the venv, or the install never completed. Run
+`python check_setup.py`; it names the cause and the fix.
+
+Otherwise check [HARDWARE.md](HARDWARE.md)'s pass/fail matrix for your
 model size. The series is calibrated against Qwen2.5-7B-Instruct;
 smaller models fumble more - and watching the framework catch a
 fumble is the point - but a hard crash in 08 or 09 on a small model
